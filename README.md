@@ -40,3 +40,5 @@ On every push, GitHub Actions:
 - `server.js` — Express application;
 - `k8s-node-app.yaml` — Kubernetes Deployment and NodePort Service;
 - `.github/workflows/deploy-to-minikube-github-actions.yaml` — GitHub Actions workflow.
+
+The workflow is configured to run automatically after each push to the repository.
