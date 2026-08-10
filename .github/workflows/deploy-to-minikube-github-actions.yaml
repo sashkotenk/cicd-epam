@@ -3,6 +3,10 @@ name: Deploy to Minikube using GitHub Actions
 on:
   push:
 
+concurrency:
+  group: minikube-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -32,6 +36,7 @@ jobs:
         run: |
           kubectl apply -f k8s-node-app.yaml
           kubectl rollout status deployment/nodejs-app --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=nodejs-app --timeout=120s
           kubectl get pods -o wide
           kubectl get services
 
@@ -40,7 +45,7 @@ jobs:
           minikube service list
           URL="$(minikube service nodejs-app --url | head -n 1)"
           echo "Node.js application URL: $URL"
-          curl --fail --retry 10 --retry-delay 2 "$URL"
+          curl --fail --retry 15 --retry-delay 2 --retry-connrefused "$URL"
 
       - name: Kubernetes diagnostics
         if: always()
